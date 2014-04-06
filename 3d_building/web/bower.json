@@ -1,0 +1,20 @@
+{
+  "name": "lab11 visualizations - 3d building",
+  "version": "0.1.0",
+  "homepage": "https://github.com/lab11/visualizations",
+  "authors": [
+    "Brad Campbell <bradjc5@gmail.com>"
+  ],
+  "description": "Visualizations of building",
+  "keywords": [
+    "data"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+	"jquery": ">= 1.10.2",
+	"socket.io-client": ">= 0.8.7",
+	"underscore": ">= 1.5.2",
+	"threejs": null
+  }
+}

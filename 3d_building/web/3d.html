@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+
+		<script src="bower_components/socket.io-client/dist/socket.io.min.js"></script>
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/underscore/underscore.js"></script>
+		<script>WEB_SOCKET_SWF_LOCATION='bower_components/socket.io-client/dist/WebSocketMain.swf'</script>
+
+		<title>Michigan CSE 3D</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#building-title {
+				font-size: 30px;
+				text-align: center;
+				position : absolute;
+				top: 0px;
+				left:10px;
+			}
+			#room-title {
+				font-size: 20px;
+				text-align: center;
+				position: absolute;
+				left:10px;
+				top: 40px;
+			}
+			#room-info {
+				font-size: 20px;
+				position: absolute;
+				left:10px;
+				top: 70px;
+				width: 200px;
+				height: 400px;
+				background-color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="building-title">
+				<span class="field">Building:</span>
+				<span class="fieldval">?</span>
+			</div>
+			<div id="room-title">
+				<span class="field">Room:</span>
+				<span class="fieldval">b</span>
+			</div>
+
+			<div id="room-info">
+				<p class="room-number">room</p>
+			</div>
+		</div>
+
+		<script src="bower_components/threejs/build/three.js"></script>
+
+		<script src="js/threejs-stats.min.js"></script>
+		<script src="js/threejs-TrackballControls.js"></script>
+
+		<script>
+
+			var building = {"name": "Bob and Betty Beyster Building", "height": 52.600899999999996, "name_short": "BBB", "width": 30.709, "floors": [{"z": 0, "name": "4", "rooms": [{"name": "4757", "coordinates": [[0.0, 0.0], [2.0, 0.0], [2.0, 2.0], [0.0, 2.0]], "offset": [1.658, 0.0]}, {"name": "hallway1", "coordinates": [[0.0, 0.0], [0.0, 1.4079999999999995], [4.748, 1.4079999999999995], [4.748, 14.185], [3.706, 14.185], [3.706, 19.695999999999998], [6.247, 19.695999999999998], [6.247, 32.4598], [6.247, 44.409000000000006], [3.706, 44.409000000000006], [3.706, 49.92], [4.9205000000000005, 49.92], [4.9205000000000005, 50.5009], [6.8925, 50.5009], [6.8925, 49.92], [18.228, 49.92], [26.1836, 49.92], [26.1836, 47.706], [18.228, 47.706], [8.228, 47.706], [8.228, 17.786], [19.5674, 17.786], [26.732, 17.786], [26.732, 26.2593], [26.732, 49.92], [29.051000000000002, 49.92], [29.051000000000002, 26.2593], [29.051000000000002, 15.195], [19.5674, 15.195], [6.729, 15.195], [6.729, 1.7279999999999998], [20.0, 1.7279999999999998], [20.0, 0.0]], "offset": [1.658, 2.1000000000000005]}, {"name": "4765", "coordinates": [[4.648, 3.06], [4.648, 0.0], [0.0, 0.0], [0.0, 3.06]], "offset": [1.658, 3.615]}, {"name": "4770", "coordinates": [[0.0, 13.267], [0.0, 0.0], [6.968000000000001, 0.0], [6.968000000000001, 13.267]], "offset": [8.487, 3.9280000000000004]}, {"name": "4769", "coordinates": [[0.0, 3.0700000000000003], [0.0, 0.0], [4.648, 0.0], [4.648, 3.0700000000000003]], "offset": [1.658, 6.775]}, {"name": "4773", "coordinates": [[0.0, 3.0700000000000003], [0.0, 0.0], [4.648, 0.0], [4.648, 3.0700000000000003]], "offset": [1.658, 9.945]}, {"name": "4777", "coordinates": [[0.0, 3.0699999999999994], [4.648, 3.0699999999999994], [4.648, 0.0], [0.0, 0.0]], "offset": [1.658, 13.115]}, {"name": "4901", "coordinates": [[5.263999999999999, 0.5240000000000009], [5.263999999999999, 6.035], [2.425, 6.035], [2.425, 6.598000000000001], [0.0, 6.598000000000001], [0.0, 0.0], [0.9020000000000001, 0.0], [0.9020000000000001, 0.5240000000000009]], "offset": [0.0, 15.761]}, {"name": "4908", "coordinates": [[0.3799999999999999, 0.0], [0.3799999999999999, 0.6530000000000005], [0.0, 0.6530000000000005], [0.0, 6.042999999999999], [10.087, 6.042999999999999], [10.087, 0.0]], "offset": [9.986, 19.986]}, {"name": "4999", "coordinates": [[0.0, 0.0], [0.0, 7.370899999999999], [5.599, 7.370899999999999], [5.599, 0.0]], "offset": [20.173, 19.986]}, {"name": "4909", "coordinates": [[5.0, 4.312999999999999], [5.0, 0.0], [0.0, 0.0], [0.0, 4.312999999999999]], "offset": [2.8049999999999997, 21.896]}, {"name": "4916", "coordinates": [[0.0, 6.0], [0.0, 0.0], [10.087, 0.0], [10.087, 6.0]], "offset": [9.986, 26.129]}, {"name": "4917", "coordinates": [[0.0, 10.0], [5.0, 10.0], [5.0, 0.0], [0.0, 0.0]], "offset": [2.8049999999999997, 26.309]}, {"name": "4918", "coordinates": [[0.0, 0.0], [0.0, 8.0], [10.087, 8.0], [10.087, 0.0]], "offset": [9.986, 32.229]}, {"name": "4929", "coordinates": [[0.0, 10.0], [0.0, 0.0], [5.0, 0.0], [5.0, 10.0]], "offset": [2.8049999999999997, 36.409]}, {"name": "4932", "coordinates": [[0.0, 9.376999999999995], [0.0, 0.0], [10.087, 0.0], [10.087, 9.376999999999995]], "offset": [9.986, 40.329]}, {"name": "4941", "coordinates": [[5.263999999999999, 6.073999999999998], [0.9020000000000001, 6.073999999999998], [0.9020000000000001, 6.597999999999999], [0.0, 6.597999999999999], [0.0, 0.0], [2.425, 0.0], [2.425, 0.5630000000000024], [5.263999999999999, 0.5630000000000024]], "offset": [0.0, 45.946]}]}], "gps": [1, 2]}
+;
+
+
+			var container, stats;
+			var camera, scene, renderer;
+			var projector, raycaster;
+
+			var mouse = new THREE.Vector2();
+
+			var last_mousedown;
+
+			var LOC_VLC_PID = 'WEgwAGyc9N';
+
+
+			var rooms = {};
+
+			var floor_objects = new THREE.Object3D();
+			var wall_objects  = new THREE.Object3D();
+
+			// Add a room to the display
+			//
+			// room_name:  string to identify the room. must be unique
+			// active:     whether to make the room clickable and highlight on
+			//             hover
+			// points:     list of x,y points that define the border of the room
+			// x,y,z:      x,y,z offset of the bottom left corner of the room from
+			//             the origin of the display
+			function add_room (room_name, active, points, x, y, z) {
+
+				rooms[room_name] = {};
+
+				// Store the offset for this room to make adding points easier
+				// later
+				rooms[room_name]["offset"] = [x,y,z];
+
+				// Set the colors based on whether this room is active or not
+				if (active) {
+					floor_color = 0xffffff;
+					outline_color = 0x333333;
+				} else {
+					floor_color = 0xdddddd;
+					outline_color = 0x333333;
+				}
+
+				// Create vectors for each point
+				var vectors = [];
+				for (i=0; i<points.length; i++) {
+					vectors.push(new THREE.Vector2(-points[i][0], points[i][1]));
+
+				}
+				var room = new THREE.Shape(vectors);
+
+				// Create the floor
+				var geometry = new THREE.ShapeGeometry(room);
+				var material = new THREE.MeshBasicMaterial({
+					color: floor_color,
+					side: THREE.DoubleSide,
+					overdraw:0.5});
+				var mesh     = new THREE.Mesh(geometry, material);
+				mesh.position.set(-x, z, y);
+				mesh.rotation.set(Math.PI/2, 0, 0);
+				mesh.scale.set(1, 1, 1);
+				mesh.room_name = room_name;
+
+				rooms[room_name]["floor"] = mesh;
+				floor_objects.add(mesh);
+				scene.add(floor_objects);
+
+				// Create the wall outline
+				var geometry = room.createPointsGeometry();
+				var material = new THREE.LineBasicMaterial({
+					linewidth: 2,
+					color: outline_color});
+				var line     = new THREE.Line(geometry, material);
+				line.position.set(-x, z, y);
+				line.rotation.set(Math.PI/2, 0, 0);
+				line.scale.set(1, 1, 1);
+				scene.add(line);
+
+				rooms[room_name]["outline"] = line;
+
+				// Add the transparent walls that appear on hover if the room
+				// is active
+				if (active) {
+
+					var room_extrude_path = new THREE.SplineCurve3(
+						[new THREE.Vector3(0, 0, 0),
+						 new THREE.Vector3(0, 0, 3)]);
+
+					var extrudeSettings = {amount: 1,
+					                       extrudePath: room_extrude_path};
+
+					var geometry = new THREE.ExtrudeGeometry(room, extrudeSettings);
+
+					var material = new THREE.MeshBasicMaterial({
+						color: 0x000000,
+						opacity: 0.2,
+						overdraw: 0
+					});
+					var walls = new THREE.Mesh(geometry, material);
+
+					walls.position.set(-x, z+3, y);
+					walls.rotation.set(Math.PI/2, 0, Math.PI/2);
+					walls.scale.set(1,1,1);
+					walls.visible = false;
+
+
+					rooms[room_name]["walls"] = walls;
+					wall_objects.add(walls);
+					scene.add(wall_objects);
+
+				} else {
+					rooms[room_name]["walls"] = null;
+				}
+			}
+
+			// Add a dot at a particular location inside of a room
+			//
+			// room_name: name of the room to put the dot in
+			// x,y,z:     offset inside of the room to put the dot
+			function add_point (room_name, x, y, z) {
+				var geometry = new THREE.SphereGeometry(.15, 15, 6);
+				var material = new THREE.MeshBasicMaterial({color: '#ff0000'});
+				var loc      = new THREE.Mesh(geometry, material);
+
+				loc.position.set(-x - rooms[room_name]["offset"][0],
+				                 z + rooms[room_name]["offset"][2],
+				                 y + rooms[room_name]["offset"][1]);
+				scene.add(loc);
+			}
+
+			// Add an arrow from x1,y1,z1 to x2,y2,z2
+			//
+			// room_name: name of the room to put the dot in
+			// x1,y1,z1:  start of the arrow
+			// x2,y2,z2:  end of the arrow and the arrowhead
+			function add_arrow(room_name, x1, y1, z1, x2, y2, z2) {
+
+				var color = Math.random() * 0xffffff;
+
+				var offset_x = rooms[room_name]["offset"][0];
+				var offset_y = rooms[room_name]["offset"][1];
+				var offset_z = rooms[room_name]["offset"][2];
+
+				// Draw line for the arrow
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push(new THREE.Vector3(-x1-offset_x, z1+offset_z, y1+offset_y));
+				geometry.vertices.push(new THREE.Vector3(-x2-offset_x, z2+offset_z, y2+offset_y));
+				var object = new THREE.Line(geometry, new THREE.LineBasicMaterial({linewidth: 2, color: color}));
+				scene.add(object);
+
+				// Create pyramid for arrowhead
+				vertices = [[0.05,  0,      -0.0223],
+				            [-0.05, 0,      -0.0223],
+				            [-0,    0,      0.0577],
+				            [-0,    0.0837, 0]]
+				faces = [[0,1,3],
+				         [1,2,3],
+				         [2,0,3],
+				         [2,1,0]]
+				var geometry = new THREE.PolyhedronGeometry(vertices, faces, .1);
+				var material = new THREE.MeshBasicMaterial({ color: color} );
+				var point    = new THREE.Mesh(geometry, material);
+
+				// Figure out the rotation for the arrowhead
+				var line_vector     = new THREE.Vector3(-x2+x1, z2-z1, y2-y1).setLength(1);
+				var pyramid_normal  = geometry.faces[3].normal.clone().setLength(-1);
+				var rotation_axis   = new THREE.Vector3().crossVectors(line_vector, pyramid_normal).setLength(1);
+				var rotation_rad    = -Math.acos(pyramid_normal.dot(line_vector));
+				var rotation_matrix = new THREE.Matrix4().makeRotationAxis(rotation_axis, rotation_rad);
+				point.rotation.setFromRotationMatrix(rotation_matrix);
+				point.position.set(-x2-offset_x, z2+offset_z, y2+offset_y);
+				scene.add(point);
+
+			}
+
+			function get_building () {
+				$.get('bbb.json', function (data) {
+					building = data;
+					console.log(building);
+					init();
+				});
+			}
+
+
+			function init() {
+
+				container = $("#container");
+
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
+				camera.position.set(-3, 30, -40);
+				scene = new THREE.Scene();
+
+				// Load the building floor plan
+				$("#building-title .fieldval").text(building["name"]);
+
+				center_x_offset = building['width']/2;
+				center_y_offset = building['height']/2;
+
+			/*	for (floorn=0; floorn<building["floors"].length; floorn++) {
+					floor_z = building["floors"][floorn]["z"];
+					for (roomn=0; roomn<building["floors"][floorn]["rooms"].length; roomn++) {
+						room = building["floors"][floorn]["rooms"][roomn];
+						add_room(room["name"],
+						         (room["name"].lastIndexOf('hallway', 0)===0)?false:true,
+						         room["coordinates"],
+						         room["offset"][0]-center_x_offset,
+						         room["offset"][1]-center_y_offset,
+						         floor_z);
+					}
+
+				}*/
+
+				for (var floorid in building["floors"]) {
+					floor_z = building["floors"][floorid]["z"];
+					for (roomn=0; roomn<building["floors"][floorid]["rooms"].length; roomn++) {
+						room = building["floors"][floorid]["rooms"][roomn];
+						add_room(room["name"],
+						         (room["name"].lastIndexOf('hallway', 0)===0)?false:true,
+						         room["coordinates"],
+						         room["offset"][0]-center_x_offset,
+						         room["offset"][1]-center_y_offset,
+						         floor_z);
+					}
+				}
+
+				// Add some test points
+				add_point("4908", 5, 4.2,   1);
+				add_point("4908", 5, 1.1, 2.5);
+				add_point("4908", 8, 0.3, 2);
+
+				add_point("4773", 2, 2, 1);
+
+				add_arrow("4908", 8, 0.3, 2, 8.5, 0.4, 2);
+
+				// Lights
+
+				var ambientLight = new THREE.AmbientLight(Math.random()*0x10);
+				scene.add(ambientLight);
+
+				var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.add(directionalLight);
+
+				var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.add(directionalLight);
+
+
+				// tools for highlighting hovered object
+				projector = new THREE.Projector();
+				raycaster = new THREE.Raycaster();
+
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setClearColor(0xC0E4FA);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+
+				container.append(renderer.domElement);
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.right = '0px';
+				container.append( stats.domElement );
+				console.log(stats);
+
+
+				window.addEventListener('resize', onWindowResize, false);
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+				document.addEventListener('mousedown', onDocumentMouseDown, false);
+				document.addEventListener('mouseup', onDocumentMouseUp, false);
+
+				controls = new THREE.TrackballControls(camera);
+				controls.target.set( 0, 0, 0 );
+
+
+
+				// Setup SOCKETIO
+
+				socket_loc = io.connect('inductor.eecs.umich.edu:8082/stream');
+				socket_loc.on('connect', function (data) {
+					socket_loc.emit('query', {'profile_id': LOC_VLC_PID});
+				});
+
+				socket_loc.on('data', function (data) {
+					data['display_rx_time'] = Date.now();
+				//	loc_hist.push(data);
+					console.log(data);
+				});
+
+				// make it go
+				animate();
+
+			}
+
+			function onWindowResize() {
+
+				camera.left = window.innerWidth / - 2;
+				camera.right = window.innerWidth / 2;
+				camera.top = window.innerHeight / 2;
+				camera.bottom = window.innerHeight / - 2;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+
+			}
+
+			function onDocumentMouseMove (event) {
+				event.preventDefault();
+
+				mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+			}
+
+			function onDocumentMouseDown (event) {
+
+				event.preventDefault();
+
+				var vector = new THREE.Vector3((event.clientX/window.innerWidth)*2 - 1,
+				                               -(event.clientY/window.innerHeight)*2 + 1,
+				                               0.5);
+				projector.unprojectVector(vector, camera);
+
+				raycaster.set(camera.position, vector.sub(camera.position).normalize());
+				var intersects = raycaster.intersectObjects(floor_objects.children, true);
+
+				if (intersects.length > 0) {
+
+					// Mark all wall objects as hidden to start
+					for (i=0; i<wall_objects.children.length; i++) {
+						wall_objects.children[i].visible = false;
+						wall_objects.children[i].stay_visible = false;
+					}
+
+					for (i=0; i<intersects.length; i++) {
+						room_name = intersects[i].object.room_name;
+						if (rooms[room_name]["walls"] != null) {
+							rooms[room_name]["walls"].visible = true;
+							rooms[room_name]["walls"].stay_visible = true;
+							$("#room-info p").text(room_name);
+						}
+					}
+				} else {
+					last_mousedown = new Date().getTime();
+				}
+
+
+			}
+
+			function onDocumentMouseUp (event) {
+
+				event.preventDefault();
+
+				var now = new Date().getTime();
+				var diff = now - last_mousedown;
+
+				if (diff < 200) {
+					// really quick click. clear the board
+					for (i=0; i<wall_objects.children.length; i++) {
+						wall_objects.children[i].visible = false;
+						wall_objects.children[i].stay_visible = false;
+					}
+				}
+			}
+
+			function animate() {
+
+				requestAnimationFrame(animate);
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+				controls.update();
+
+				// find intersections
+
+				var vector = new THREE.Vector3(mouse.x, mouse.y, 0);
+				projector.unprojectVector(vector, camera);
+
+				raycaster.set(camera.position, vector.sub(camera.position).normalize());
+
+				var intersects = raycaster.intersectObjects(floor_objects.children, true);
+
+				// Mark all wall objects as hidden to start
+				for (i=0; i<wall_objects.children.length; i++) {
+					if (wall_objects.children[i].stay_visible == true) continue;
+					wall_objects.children[i].visible = false;
+				}
+
+				if (intersects.length > 0) {
+					for (i=0; i<intersects.length; i++) {
+						room_name = intersects[i].object.room_name;
+						if (rooms[room_name]["walls"] != null) {
+							rooms[room_name]["walls"].visible = true;
+							$("#room-title .fieldval").text(room_name);
+						}
+					}
+				}
+
+				renderer.render( scene, camera );
+			}
+
+			get_building();
+			//init();
+			//animate();
+
+		</script>
+
+
+	</body>
+</html>
