@@ -105,6 +105,7 @@ for dxf in dxfs:
 
 	# Add the new floor
 	buildings[building_id]['floors'][floorid] = copy.deepcopy(floor_template)
+	buildings[building_id]['floors'][floorid]['z'] = (int(floorid)-1)*8
 
 	# Check if we made the building bigger
 	width = max_global_x - min_global_x

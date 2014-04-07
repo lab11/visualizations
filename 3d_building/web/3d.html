@@ -268,20 +268,6 @@
 				center_x_offset = building['width']/2;
 				center_y_offset = building['height']/2;
 
-			/*	for (floorn=0; floorn<building["floors"].length; floorn++) {
-					floor_z = building["floors"][floorn]["z"];
-					for (roomn=0; roomn<building["floors"][floorn]["rooms"].length; roomn++) {
-						room = building["floors"][floorn]["rooms"][roomn];
-						add_room(room["name"],
-						         (room["name"].lastIndexOf('hallway', 0)===0)?false:true,
-						         room["coordinates"],
-						         room["offset"][0]-center_x_offset,
-						         room["offset"][1]-center_y_offset,
-						         floor_z);
-					}
-
-				}*/
-
 				for (var floorid in building["floors"]) {
 					floor_z = building["floors"][floorid]["z"];
 					for (roomn=0; roomn<building["floors"][floorid]["rooms"].length; roomn++) {
@@ -304,8 +290,8 @@
 
 				add_arrow("4908", 8, 0.3, 2, 8.5, 0.4, 2);
 
-				// Lights
 
+				// Lights
 				var ambientLight = new THREE.AmbientLight(Math.random()*0x10);
 				scene.add(ambientLight);
 
