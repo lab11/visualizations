@@ -398,14 +398,14 @@
 						wall_objects.children[i].stay_visible = false;
 					}
 
-					for (i=0; i<intersects.length; i++) {
-						room_name = intersects[i].object.room_name;
+					//for (i=0; i<intersects.length; i++) {
+						room_name = intersects[0].object.room_name;
 						if (rooms[room_name]["walls"] != null) {
 							rooms[room_name]["walls"].visible = true;
 							rooms[room_name]["walls"].stay_visible = true;
 							$("#room-info p").text(room_name);
 						}
-					}
+					//}
 				} else {
 					last_mousedown = new Date().getTime();
 				}
@@ -457,13 +457,13 @@
 				}
 
 				if (intersects.length > 0) {
-					for (i=0; i<intersects.length; i++) {
-						room_name = intersects[i].object.room_name;
+				//	for (i=0; i<intersects.length; i++) {
+						room_name = intersects[0].object.room_name;
 						if (rooms[room_name]["walls"] != null) {
 							rooms[room_name]["walls"].visible = true;
 							$("#room-title .fieldval").text(room_name);
 						}
-					}
+				//	}
 				}
 
 				renderer.render( scene, camera );
