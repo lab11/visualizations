@@ -341,7 +341,7 @@
 
 				// Setup SOCKETIO
 
-				socket_loc = io.connect('inductor.eecs.umich.edu:8082/stream');
+				socket_loc = io.connect('gatd.eecs.umich.edu:8082/stream');
 				socket_loc.on('connect', function (data) {
 					socket_loc.emit('query', {'profile_id': LOC_VLC_PID});
 				});
